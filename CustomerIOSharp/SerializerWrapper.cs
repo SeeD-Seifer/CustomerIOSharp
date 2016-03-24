@@ -28,7 +28,7 @@ namespace CustomerIOSharp
     using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Serialization;
 
-    using RestSharp.Portable.Serializers;
+    using RestSharp.Portable;
 
     /// <summary>
     /// Default JSON serializer for request bodies
@@ -43,7 +43,7 @@ namespace CustomerIOSharp
         /// </summary>
         public SerializerWrapper(Newtonsoft.Json.JsonSerializer serializer = null)
         {
-            this.ContentType = new MediaTypeHeaderValue("application/json");
+            this.ContentType = "application/json";
             this._serializer = serializer 
                 ?? new Newtonsoft.Json.JsonSerializer
                        {
@@ -65,7 +65,7 @@ namespace CustomerIOSharp
         /// <summary>
         /// Content type for serialized content
         /// </summary>
-        public MediaTypeHeaderValue ContentType { get; set; }
+        public string ContentType { get; set; }
 
         /// <summary>
         /// Serialize the object as JSON

@@ -7,7 +7,9 @@
 
     using Newtonsoft.Json;
 
-    using RestSharp.Portable;
+	using RestSharp.Portable;
+	using RestSharp.Portable.HttpClient;
+	using RestSharp.Portable.Authenticators;
 
     public class CustomerIo
     {
@@ -28,10 +30,10 @@
             this._customerFactory = customerFactory;
             this._jsonSerializer = jsonSerializer;
 
-            this._client = new RestClient(Endpoint)
-                {
-                    Authenticator = new FixedHttpBasicAuthenticator(siteId, apiKey)
-                };
+			this._client = new RestClient (Endpoint) {
+				Authenticator = new HttpBasicAuthenticator(),
+				Credentials = new NetworkCredential (siteId, apiKey)
+			};
         }
 
         public async Task IdentifyAsync(ICustomerDetails customer = null)
@@ -48,7 +50,7 @@
             // do not transmit events if we do not have a customer id
             if (customer == null || customer.Id == null) return;
 
-            await this.CallMethodAsync(MethodCustomer, HttpMethod.Put, customer, customer.Id);
+			await this.CallMethodAsync(MethodCustomer, Method.PUT, customer, customer.Id);
         }
 
         public async Task DeleteCustomerAsync(string customerId = null)
@@ -65,7 +67,7 @@
             // do not transmit events if we do not have a customer id
             if (customerId == null) return;
 
-            await this.CallMethodAsync(MethodCustomer, HttpMethod.Delete, null, customerId);
+			await this.CallMethodAsync(MethodCustomer, Method.DELETE, null, customerId);
         }
 
         /// <summary>
@@ -93,7 +95,7 @@
 
             await this.CallMethodAsync(
                 MethodCustomerEvent, 
-                HttpMethod.Post, 
+                Method.POST, 
                 wrappedData, 
                 customerId);
         }
@@ -118,15 +120,15 @@
 
             await this.CallMethodAsync(
                 MethodEvent,
-                HttpMethod.Post,
+				Method.POST,
                 wrappedData);
         }
 
-        private async Task CallMethodAsync(string method, HttpMethod httpMethod, object data, string customerId = null)
+        private async Task CallMethodAsync(string method, Method httpMethod, object data, string customerId = null)
         {
             var request = new RestRequest(method)
             {
-                Method = httpMethod,
+				Method = httpMethod,
                 Serializer = new SerializerWrapper(this._jsonSerializer)
             };
 
